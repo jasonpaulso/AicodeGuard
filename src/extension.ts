@@ -65,8 +65,9 @@ class BailoutMonitor {
     private outputBuffer: string = '';
     private detectionCount: number = 0;
     private isEnabled: boolean = true;
+    private terminals: Map<vscode.Terminal, any> = new Map();
 
-    analyzeTerminalOutput(data: string) {
+    analyzeTerminalOutput(data: string, terminal?: vscode.Terminal) {
         if (!this.isEnabled) return;
 
         this.outputBuffer += data;
@@ -161,6 +162,34 @@ class BailoutMonitor {
         console.log('Claude Bailout Monitor:', logEntry);
     }
 
+    setupTerminalMonitoring() {
+        // Monitor when terminals are opened/closed
+        vscode.window.onDidOpenTerminal(terminal => {
+            console.log(`Terminal opened: ${terminal.name}`);
+            // We'll add pseudoterminal monitoring here
+        });
+
+        vscode.window.onDidCloseTerminal(terminal => {
+            console.log(`Terminal closed: ${terminal.name}`);
+            this.terminals.delete(terminal);
+        });
+    }
+
+    // Alternative approach: Monitor text document changes for terminal output
+    setupDocumentMonitoring() {
+        vscode.workspace.onDidChangeTextDocument(event => {
+            // Check if this might be terminal-related content
+            const uri = event.document.uri;
+            if (uri.scheme === 'output' || uri.path.includes('terminal')) {
+                event.contentChanges.forEach(change => {
+                    if (change.text) {
+                        this.analyzeTerminalOutput(change.text);
+                    }
+                });
+            }
+        });
+    }
+
     enable() {
         this.isEnabled = true;
     }
@@ -184,10 +213,9 @@ export function activate(context: vscode.ExtensionContext) {
     
     bailoutMonitor = new BailoutMonitor();
 
-    // Monitor terminal data
-    const terminalDataDisposable = vscode.window.onDidWriteTerminalData(e => {
-        bailoutMonitor.analyzeTerminalOutput(e.data);
-    });
+    // Set up monitoring
+    bailoutMonitor.setupTerminalMonitoring();
+    bailoutMonitor.setupDocumentMonitoring();
 
     // Register commands
     const enableCommand = vscode.commands.registerCommand('claudeBailoutMonitor.enable', () => {
@@ -207,7 +235,7 @@ export function activate(context: vscode.ExtensionContext) {
         );
     });
 
-    context.subscriptions.push(terminalDataDisposable, enableCommand, disableCommand, statsCommand);
+    context.subscriptions.push(enableCommand, disableCommand, statsCommand);
     
     vscode.window.showInformationMessage('🚀 Claude Bailout Monitor is watching your terminal!');
 }
