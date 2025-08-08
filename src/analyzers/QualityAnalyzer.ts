@@ -29,7 +29,7 @@ export class QualityAnalyzer {
     analysis.detectionResult.patterns.forEach(pattern => {
       const lineIndex = lines.findIndex(line => line.includes(pattern.match));
       const line = lineIndex >= 0 ? lineIndex + 1 : 1;
-      const column = lineIndex >= 0 ? lines[lineIndex].indexOf(pattern.match) + 1 : 1;
+      const column = lineIndex >= 0 ? lines[lineIndex]!.indexOf(pattern.match) + 1 : 1;
       
       const issue = this.createIssueFromPattern(pattern.category, pattern.match, line, column);
       issues.push(issue);

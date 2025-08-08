@@ -34,14 +34,14 @@ suite('PatternDetector', () => {
     const code = 'eval("console.log(1)");';
     const result = patternDetector.analyzeCode(code);
     assert.ok(result.patterns.length > 0);
-    assert.strictEqual(result.patterns[0].category, 'SECURITY_ISSUES');
+    assert.strictEqual(result.patterns[0]!.category, 'SECURITY_ISSUES');
   });
 
   test('should detect TypeScript bailouts in code', () => {
     const code = 'const x: any = {};';
     const result = patternDetector.analyzeCode(code);
     assert.ok(result.patterns.length > 0);
-    assert.strictEqual(result.patterns[0].category, 'TYPESCRIPT_BAILOUTS');
+    assert.strictEqual(result.patterns[0]!.category, 'TYPESCRIPT_BAILOUTS');
   });
 
   test('should calculate severity score correctly', () => {
