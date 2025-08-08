@@ -54,6 +54,8 @@ suite('PatternDetector', () => {
   test('should determine quality level correctly', () => {
     const code = 'eval("malicious code");';
     const result = patternDetector.analyzeCode(code);
-    assert.ok(['POOR', 'CRITICAL'].includes(result.qualityLevel));
+    // eval() has weight 25, should be ACCEPTABLE (15-29 range)
+    assert.strictEqual(result.qualityLevel, 'ACCEPTABLE');
+    assert.strictEqual(result.severityScore, 25);
   });
 });

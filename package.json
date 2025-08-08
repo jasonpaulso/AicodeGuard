@@ -163,7 +163,7 @@
   },
   "scripts": {
     "compile": "tsc -p ./",
-    "test": "ts-mocha test/**/*.test.ts"
+    "test": "mocha --require ts-node/register --extensions ts test/**/*.test.ts"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
