@@ -1,0 +1,179 @@
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import { QualityAnalyzer } from '../src/analyzers/QualityAnalyzer';
+import { FileAnalysis } from '../src/types/common';
+import { PatternDetector } from '../src/core/PatternDetector';
+import * as vscode from 'vscode';
+
+suite('QualityAnalyzer', () => {
+  let qualityAnalyzer: QualityAnalyzer;
+  let patternDetector: PatternDetector;
+  let sandbox: sinon.SinonSandbox;
+
+  setup(() => {
+    sandbox = sinon.createSandbox();
+    qualityAnalyzer = new QualityAnalyzer();
+    patternDetector = new PatternDetector();
+
+    // Mock vscode.window.activeTextEditor
+    const mockEditor = {
+      document: {
+        getText: () => 'eval("test code");\nconsole.log("debug");'
+      }
+    };
+    sandbox.stub(vscode.window, 'activeTextEditor').value(mockEditor);
+  });
+
+  teardown(() => {
+    sandbox.restore();
+  });
+
+  test('should generate quality report with correct structure', () => {
+    const detectionResult = patternDetector.analyzeCode('eval("test");');
+    
+    const analysis: FileAnalysis = {
+      filePath: '/test/path/file.ts',
+      timestamp: Date.now(),
+      detectionResult,
+      triggerType: 'MANUAL',
+      interventionLevel: 'WARNING'
+    };
+
+    const report = qualityAnalyzer.generateQualityReport(analysis);
+    
+    expect(report).to.have.property('file');
+    expect(report).to.have.property('totalIssues');
+    expect(report).to.have.property('criticalCount');
+    expect(report).to.have.property('highCount');
+    expect(report).to.have.property('issues');
+    expect(report).to.have.property('aiInstruction');
+    
+    expect(report.file).to.equal('file.ts');
+    expect(report.totalIssues).to.equal(detectionResult.patterns.length);
+  });
+
+  it('should extract detailed issues from analysis', () => {
+    const detectionResult = patternDetector.analyzeCode('console.log("debug"); eval("test");');
+    
+    const analysis: FileAnalysis = {
+      filePath: '/test/debug.ts',
+      timestamp: Date.now(),
+      detectionResult,
+      triggerType: 'SAVE',
+      interventionLevel: 'WARNING'
+    };
+
+    const issues = qualityAnalyzer.extractDetailedIssues(analysis);
+    
+    expect(issues).to.be.an('array');
+    expect(issues.length).to.equal(detectionResult.patterns.length);
+    
+    if (issues.length > 0) {
+      const firstIssue = issues[0]!;
+      expect(firstIssue).to.have.property('line');
+      expect(firstIssue).to.have.property('column');
+      expect(firstIssue).to.have.property('category');
+      expect(firstIssue).to.have.property('severity');
+      expect(firstIssue).to.have.property('pattern');
+      expect(firstIssue).to.have.property('problem');
+      expect(firstIssue).to.have.property('instruction');
+    }
+  });
+
+  it('should build AI instruction with appropriate severity sections', () => {
+    const detectionResult = patternDetector.analyzeCode('eval("malicious"); console.log("debug");');
+    
+    const analysis: FileAnalysis = {
+      filePath: '/test/mixed.ts',
+      timestamp: Date.now(),
+      detectionResult,
+      triggerType: 'MANUAL',
+      interventionLevel: 'WARNING'
+    };
+
+    const issues = qualityAnalyzer.extractDetailedIssues(analysis);
+    const instruction = qualityAnalyzer.buildAIInstruction(issues, 'mixed.ts');
+    
+    expect(instruction).to.include('CODE QUALITY ISSUES DETECTED in mixed.ts');
+    expect(instruction).to.include('Please rewrite the affected sections');
+    
+    // Should contain appropriate severity markers if issues exist
+    if (issues.some(issue => issue.severity === 'CRITICAL')) {
+      expect(instruction).to.include('🚨 CRITICAL SECURITY ISSUES');
+    }
+    if (issues.some(issue => issue.severity === 'HIGH')) {
+      expect(instruction).to.include('⚠️ HIGH PRIORITY ISSUES');
+    }
+    if (issues.some(issue => issue.severity === 'MEDIUM')) {
+      expect(instruction).to.include('📋 MEDIUM PRIORITY ISSUES');
+    }
+  });
+
+  it('should categorize issues correctly based on pattern category', () => {
+    const detectionResult = {
+      patterns: [
+        { category: 'SECURITY_ISSUES', pattern: 'eval', match: 'eval("test")', weight: 25, source: 'code' as const },
+        { category: 'TYPESCRIPT_BAILOUTS', pattern: 'any', match: ': any', weight: 15, source: 'code' as const },
+        { category: 'PRODUCTION_ISSUES', pattern: 'console.log', match: 'console.log', weight: 10, source: 'code' as const }
+      ],
+      severityScore: 50,
+      qualityLevel: 'CRITICAL' as const,
+      hasDirectRefusal: false,
+      hasEducationalDeflection: false,
+      terminalPatterns: [],
+      codePatterns: []
+    };
+
+    const analysis: FileAnalysis = {
+      filePath: '/test/categories.ts',
+      timestamp: Date.now(),
+      detectionResult,
+      triggerType: 'MANUAL',
+      interventionLevel: 'WARNING'
+    };
+
+    const issues = qualityAnalyzer.extractDetailedIssues(analysis);
+    
+    expect(issues).to.have.length(3);
+    
+    const securityIssue = issues.find(issue => issue.category === 'SECURITY');
+    const typeIssue = issues.find(issue => issue.category === 'TYPE_SAFETY');
+    const productionIssue = issues.find(issue => issue.category === 'PRODUCTION');
+    
+    expect(securityIssue).to.exist;
+    expect(securityIssue!.severity).to.equal('CRITICAL');
+    
+    expect(typeIssue).to.exist;
+    expect(typeIssue!.severity).to.equal('HIGH');
+    
+    expect(productionIssue).to.exist;
+    expect(productionIssue!.severity).to.equal('MEDIUM');
+  });
+
+  it('should handle empty detection results', () => {
+    const detectionResult = {
+      patterns: [],
+      severityScore: 0,
+      qualityLevel: 'EXCELLENT' as const,
+      hasDirectRefusal: false,
+      hasEducationalDeflection: false,
+      terminalPatterns: [],
+      codePatterns: []
+    };
+
+    const analysis: FileAnalysis = {
+      filePath: '/test/clean.ts',
+      timestamp: Date.now(),
+      detectionResult,
+      triggerType: 'MANUAL',
+      interventionLevel: 'NONE'
+    };
+
+    const report = qualityAnalyzer.generateQualityReport(analysis);
+    
+    expect(report.totalIssues).to.equal(0);
+    expect(report.criticalCount).to.equal(0);
+    expect(report.highCount).to.equal(0);
+    expect(report.issues).to.be.empty;
+  });
+});
