@@ -19,55 +19,14 @@ npm install
 # Compile TypeScript
 npm run compile
 
-# Run tests
-npm test
-
-# Or use the comprehensive test runner
-chmod +x test-runner.sh
-./test-runner.sh
+# Run in development mode
+# Press F5 in VS Code to launch Extension Development Host
 ```
 
 ### VS Code Development
 1. Open project in VS Code
 2. Press `F5` to launch Extension Development Host
-3. Test the extension in the new VS Code window
-
-## 🧪 Testing
-
-The project includes a comprehensive test suite covering all core functionality:
-
-### Test Coverage
-- **PatternDetector**: Terminal and code pattern detection logic
-- **ConversationWatcher**: AI conversation monitoring and intervention
-- **InterventionEngine**: AI correction and quality enforcement
-- **ConfigManager**: Configuration management and profiles
-- **QualityAnalyzer**: Code quality analysis and reporting
-- **ConversationAnalyzer**: TODO bailout pattern analysis
-
-### Running Tests
-```bash
-# Standard test run
-npm test
-
-# With compilation check
-npm run compile && npm test
-
-# Comprehensive test runner (recommended)
-./test-runner.sh
-```
-
-### Test Architecture
-- **Framework**: Mocha + TypeScript
-- **Assertions**: Node.js assert module
-- **Mocking**: Sinon.js for VS Code API mocking
-- **Structure**: One test file per source component
-
-### Mock Strategy
-Tests properly mock VS Code APIs and file system operations to ensure:
-- ✅ Tests run without VS Code context
-- ✅ File system operations are stubbed
-- ✅ Terminal interactions are mocked
-- ✅ Configuration APIs are simulated
+3. The extension will automatically activate and start monitoring
 
 ## 🎯 Core Features
 
@@ -76,6 +35,7 @@ Tests properly mock VS Code APIs and file system operations to ensure:
 - Implementation gap detection (when AI avoids coding)
 - Terminal intervention (ESC + correction messages)
 - Educational deflection prevention
+- **Subagent delegation detection**: Catches when AI creates subagents to avoid direct implementation
 
 ### 📁 Code Quality Monitoring  
 - Real-time typing analysis (2-second delay after typing stops)
@@ -89,6 +49,12 @@ Tests properly mock VS Code APIs and file system operations to ensure:
 - **WARNING**: Notification-based quality alerts
 - **TERMINAL**: AI assistant conversation correction
 
+### 🤖 Subagent Detection
+- **Delegation pattern recognition**: Detects when Claude creates or mentions subagents
+- **Task handoff monitoring**: Catches "I'm creating a subagent to handle this"
+- **Incomplete delegation alerts**: Identifies when subagents fail to deliver complete solutions
+- **Multi-agent bailout prevention**: Stops AI from passing responsibility between agents
+
 ## 📊 Detected Patterns
 
 ### AI Assistant Behavior
@@ -97,12 +63,47 @@ Tests properly mock VS Code APIs and file system operations to ensure:
 - Scope reduction ("basic implementation", "simple version")
 - Complexity avoidance ("too complex", "beyond scope")
 - Architectural deflection ("let's think about architecture first")
+- **Subagent creation**: "I'm creating a subagent to handle this complex task"
+- **Delegation bailouts**: "The delegated agent will handle the implementation"
 
 ### Code Quality Issues
 - **Security vulnerabilities** (`eval()`, `innerHTML`, injection risks)
 - **TypeScript problems** (`as any`, type safety violations)
 - **Production issues** (`console.log`, debug code, TODO comments)
 - **Implementation quality** (placeholder functions, incomplete logic)
+
+## 🚨 Alert Examples
+
+### High Severity Tool Bailout
+```
+🚨🚨🚨 TOOL BAILOUT DETECTED! 🚨🚨🚨
+File: a4a5b6ff-1c03-4945-86e1-3f8ff6a13e7e.jsonl
+Message: 15
+Tool: todowrite (medium confidence)  
+Severity: HIGH
+Description: Claude created a TODO list instead of implementing
+
+📋 ENHANCED TODO ANALYSIS:
+Total TODO items: 14
+Tool: todowrite
+Top TODO items:
+1. Analyze existing project structure...
+2. Create custom JWT utilities...
+3. Implement user authentication middleware...
+```
+
+### Subagent Bailout Detection
+```
+🤖 SUBAGENT BAILOUT DETECTED! 🤖
+Pattern: "I'm creating a subagent to handle this complex task"
+Severity: HIGH
+Description: Claude attempting to delegate instead of implementing
+
+🔗 DELEGATION ANALYSIS:
+- Responsibility transfer detected
+- No actual implementation provided
+- Subagent creation as avoidance mechanism
+```
 
 ## ⚙️ Configuration
 
@@ -166,6 +167,39 @@ src/
     └── conversation-patterns.json # Conversation analysis rules
 ```
 
+## 🔮 Roadmap
+
+### ✅ Phase 1: Nuclear Override (COMPLETED)
+- **Real intervention**: ✅ Interrupts Claude mid-response with ESC key
+- **Override commands**: ✅ Sends corrective prompts automatically
+- **Terminal integration**: ✅ Direct terminal command injection
+- **Subagent blocking**: ✅ Prevents agent creation and forces direct implementation
+
+### Phase 2: Advanced Intervention (In Progress)
+- **Multi-terminal support**: Handle multiple Claude sessions simultaneously
+- **Smart intervention timing**: Better detection of when Claude is actually responding vs. loading
+- **Custom correction prompts**: User-configurable intervention messages
+- **Intervention success tracking**: Measure how often corrections actually work
+
+### Phase 3: Multi-AI Support (Future)
+- **ChatGPT CLI monitoring**: Expand beyond Claude
+- **Gemini integration**: Support Google's AI tools
+- **Universal patterns**: Cross-AI bailout detection
+- **Multi-agent orchestration blocking**: Prevent complex delegation chains across different AI tools
+
+### Phase 4: Analytics Dashboard (Future)
+- **Bailout statistics**: Track patterns over time
+- **Performance metrics**: Measure intervention success rates
+- **Custom patterns**: User-defined detection rules
+- **Subagent usage analytics**: Track delegation attempts and success rates
+- **Project-level reporting**: Bailout trends across different codebases
+
+### Phase 5: Community Features (Future)
+- **Pattern sharing**: Community-driven bailout database
+- **Marketplace distribution**: VS Code marketplace release
+- **Enterprise features**: Team monitoring and reporting
+- **AI training feedback**: Send successful interventions back to improve AI behavior
+
 ## 📊 Performance Impact
 
 - **Typing Analysis**: 2-second delay after typing stops
@@ -177,15 +211,15 @@ src/
 
 1. Fork the repository
 2. Create feature branch: `git checkout -b feature/new-capability`
-3. Add tests for new functionality
-4. Ensure all tests pass: `./test-runner.sh`
+3. Add functionality with proper error handling
+4. Update documentation for new commands/features
 5. Submit pull request
 
 ### Development Guidelines
-- All new features must include comprehensive tests
-- Mock VS Code APIs properly in tests
 - Follow existing TypeScript patterns
+- Implement robust error handling
 - Update documentation for new commands/features
+- Test with real AI assistant interactions
 
 ## 📄 License
 
@@ -196,6 +230,7 @@ MIT License - Feel free to use and modify for your projects.
 - Built for the developer community frustrated with AI planning instead of implementing
 - Research-backed approach to AI assistant quality monitoring
 - Inspired by the need for production-ready AI-generated code
+- Special recognition for identifying subagent delegation as a new form of AI avoidance
 
 ---
 
