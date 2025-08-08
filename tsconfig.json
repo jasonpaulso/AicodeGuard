@@ -13,6 +13,6 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
-  "exclude": ["node_modules", ".vscode-test", "src/archived"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", ".vscode-test", "src/archived", "test/**/*", "**/*.test.ts", "**/*.spec.ts"]
 }

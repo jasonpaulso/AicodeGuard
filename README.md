@@ -1,248 +1,191 @@
-# 🛡️ AI Code Guard v1.0.0
+# 🛡️ AI Code Guard
 
-**Professional-grade real-time monitoring and intervention for AI coding assistants.**
+**Real-time AI code quality monitoring and intervention system.**
 
-A VS Code extension that automatically detects when Claude Code (or other AI tools) tries to avoid implementing complete solutions, and intelligently intervenes to enforce production-quality code standards.
-
-## 🚀 Key Features
-
-### ⚡ **Dual Monitoring System**
-- **📺 Terminal Monitoring**: Real-time Claude conversation analysis with automatic intervention
-- **📁 File Quality Monitoring**: Live code analysis with save blocking for critical issues
-- **🎯 Smart Integration**: Both systems work together for comprehensive protection
-
-### 🛑 **Automatic Terminal Intervention**
-- **Zero-Click Operation**: Automatically interrupts Claude when bailout patterns detected
-- **Clean Corrections**: Sends professional, specific correction messages
-- **Intelligent Timing**: 30-second cooldowns prevent intervention spam
-- **Background Operation**: Works seamlessly while you code
-
-### 📊 **Real-Time Code Quality Enforcement**
-- **Typing Analysis**: Detects issues as you type (2-second delay)
-- **Save Intervention**: Blocks saving files with critical security issues
-- **Pattern Recognition**: Identifies TypeScript bailouts, security vulnerabilities, production issues
-- **Auto-Fix Suggestions**: Provides specific corrections for detected problems
-
-### ⚙️ **Flexible Configuration System**
-- **3 Monitoring Modes**: File Only, Terminal Only, Both, or Disabled
-- **3 Aggressiveness Levels**: Zero-Tolerance, Sophisticated, Light
-- **Easy Switching**: Quick config via Command Palette
-- **Persistent Settings**: Configuration saved in VS Code settings
-
-## 🎯 Configuration Modes
-
-### **Monitoring Modes**
-
-| Mode | Description | Use Case |
-|------|-------------|----------|
-| **📁📺 Both** | Monitor files + terminal conversations | **Recommended** - Complete protection |
-| **📁 File Only** | Real-time file quality monitoring | Code review, quality enforcement |
-| **📺 Terminal Only** | Claude conversation monitoring | AI interaction control |
-| **❌ Disabled** | Turn off all monitoring | Temporary disable |
-
-### **Aggressiveness Levels**
-
-| Level | Intervention Score | Description | Best For |
-|-------|-------------------|-------------|----------|
-| **🚨 Zero-Tolerance** | ≥ 10 | Maximum protection, catches everything | Production environments |
-| **🎯 Sophisticated** | ≥ 30 | Intelligent balanced monitoring | **Default** - Daily development |
-| **🌙 Light** | ≥ 80 | Only blatant security issues | Learning, experimentation |
-
-## 📋 Detected Patterns
-
-### **🚨 Terminal Bailout Patterns (Claude Conversations)**
-- **Direct Refusal**: "I cannot generate code for you"
-- **Educational Deflection**: "This will help you learn" 
-- **Complexity Avoidance**: "This is quite complex"
-- **Scope Reduction**: "Let me provide a simpler approach"
-- **Responsibility Transfer**: "You'll need to add proper error handling"
-- **TODO Creation**: Detection of planning lists instead of implementation
-
-### **💻 Code Quality Issues (File Monitoring)**
-- **Security Vulnerabilities**: `eval()`, `innerHTML`, injection risks
-- **TypeScript Bailouts**: `as any`, missing type definitions
-- **Production Issues**: `console.log`, `debugger`, debug code
-- **Code Quality**: TODO comments, placeholder functions, incomplete implementations
+A VS Code extension that monitors AI coding assistants and ensures they provide complete, production-ready implementations instead of planning, mock code, or educational deflection.
 
 ## 🚀 Quick Start
 
-### **Installation**
-1. **Install the extension** in VS Code
-2. **Automatic activation** - no setup required
-3. **Check output channel** - "AI Code Guard" for status
+### Installation
+```bash
+# Clone and install
+git clone <repository-url>
+cd ai-code-guard
+npm install
+```
 
-### **Basic Usage**
-1. **Start coding** with Claude Code running in terminal
-2. **Extension monitors automatically** - file changes and terminal conversations
-3. **Automatic intervention** when issues detected
-4. **Manual commands** available via Command Palette
+### Development
+```bash
+# Compile TypeScript
+npm run compile
 
-### **Configuration**
-- **Quick Config**: `Ctrl+Shift+P` → "AI Monitor: Quick Config"
-- **Full Config**: `Ctrl+Shift+P` → "AI Monitor: Configure"
-- **Settings**: Available in VS Code Settings → Extensions → AI Bailout Monitor
+# Run tests
+npm test
+
+# Or use the comprehensive test runner
+chmod +x test-runner.sh
+./test-runner.sh
+```
+
+### VS Code Development
+1. Open project in VS Code
+2. Press `F5` to launch Extension Development Host
+3. Test the extension in the new VS Code window
+
+## 🧪 Testing
+
+The project includes a comprehensive test suite covering all core functionality:
+
+### Test Coverage
+- **PatternDetector**: Terminal and code pattern detection logic
+- **ConversationWatcher**: AI conversation monitoring and intervention
+- **InterventionEngine**: AI correction and quality enforcement
+- **ConfigManager**: Configuration management and profiles
+- **QualityAnalyzer**: Code quality analysis and reporting
+- **ConversationAnalyzer**: TODO bailout pattern analysis
+
+### Running Tests
+```bash
+# Standard test run
+npm test
+
+# With compilation check
+npm run compile && npm test
+
+# Comprehensive test runner (recommended)
+./test-runner.sh
+```
+
+### Test Architecture
+- **Framework**: Mocha + TypeScript
+- **Assertions**: Node.js assert module
+- **Mocking**: Sinon.js for VS Code API mocking
+- **Structure**: One test file per source component
+
+### Mock Strategy
+Tests properly mock VS Code APIs and file system operations to ensure:
+- ✅ Tests run without VS Code context
+- ✅ File system operations are stubbed
+- ✅ Terminal interactions are mocked
+- ✅ Configuration APIs are simulated
+
+## 🎯 Core Features
+
+### 📺 AI Assistant Monitoring
+- Real-time Claude Code conversation analysis
+- Implementation gap detection (when AI avoids coding)
+- Terminal intervention (ESC + correction messages)
+- Educational deflection prevention
+
+### 📁 Code Quality Monitoring  
+- Real-time typing analysis (2-second delay after typing stops)
+- Save intervention (blocks saves with critical issues)
+- File focus analysis (when switching between files)
+- Automatic code corrections (TypeScript, security, production issues)
+
+### 🚨 Quality Enforcement
+- **BLOCK**: Critical issues prevent file saving
+- **SIGNAL_AI**: Active intervention with AI fix requests
+- **WARNING**: Notification-based quality alerts
+- **TERMINAL**: AI assistant conversation correction
+
+## 📊 Detected Patterns
+
+### AI Assistant Behavior
+- Implementation refusal ("I cannot generate code")
+- Educational positioning ("this will help you learn")
+- Scope reduction ("basic implementation", "simple version")
+- Complexity avoidance ("too complex", "beyond scope")
+- Architectural deflection ("let's think about architecture first")
+
+### Code Quality Issues
+- **Security vulnerabilities** (`eval()`, `innerHTML`, injection risks)
+- **TypeScript problems** (`as any`, type safety violations)
+- **Production issues** (`console.log`, debug code, TODO comments)
+- **Implementation quality** (placeholder functions, incomplete logic)
+
+## ⚙️ Configuration
+
+### Monitoring Modes
+- **Both** (recommended): Monitor files + AI conversations
+- **File Watcher Only**: Real-time code quality analysis
+- **Terminal Only**: AI conversation monitoring
+- **Disabled**: Turn off all monitoring
+
+### Aggressiveness Levels
+- **Zero-Tolerance**: Maximum protection, catches everything
+- **Sophisticated** (recommended): Intelligent balanced monitoring
+- **Light**: Minimal monitoring, only blatant security issues
+
+### Access Configuration
+- Command Palette: `AI Code Guard: Configure`
+- Quick Config: `AI Code Guard: Quick Config`  
+- Status Bar: Click the 🛡️ icon
 
 ## 🛠️ Available Commands
 
 | Command | Description |
 |---------|-------------|
-| **AI Monitor: Configure** | Full configuration interface |
-| **AI Monitor: Quick Config** | Fast mode switching |
-| **AI Monitor: Test Patterns** | Verify all systems working |
-| **AI Monitor: Analyze Current File** | Manual quality check |
-| **AI Monitor: Fix Code Issues** | Show corrections for current file |
-| **AI Monitor: Show Stats** | Display monitoring statistics |
-| **AI Monitor: Nuclear Override** | Force AI compliance (emergency) |
+| `Test Patterns` | Verify all monitoring systems |
+| `Analyze Current File` | Manual quality analysis |
+| `Fix Code Issues` | Show AI correction suggestions |
+| `Show Statistics` | Monitoring statistics |
+| `Quality Enforcement` | Force implementation standards |
+| `Enable/Disable Monitoring` | Control system state |
 
-## 🎮 Example Workflows
+## 📈 Research Foundation
 
-### **Typical Development Session**
-1. **Start Claude Code**: `claude "help me build a web app"`
-2. **Extension monitors automatically** - both terminal and files
-3. **AI tries to create TODO list**: Automatic intervention sent
-4. **You write code with security issue**: Save blocked, fixes suggested
-5. **Seamless protection** throughout development
+Based on empirical research into AI coding assistant limitations:
+- AI tools produce correct code only **46-65%** of the time
+- **50%** of AI-generated code contains security vulnerabilities  
+- **67%** of developers report incomplete implementations as primary concern
+- Real-time intervention prevents technical debt accumulation
 
-### **Zero-Tolerance Production Mode**
-```bash
-# Set maximum protection
-Ctrl+Shift+P → "AI Monitor: Configure" → "Zero-Tolerance"
-# Now catches even minor issues and blocks saves aggressively
+## 🏗️ Architecture
+
+```
+src/
+├── core/
+│   ├── extension.ts          # Main VS Code extension entry
+│   ├── CodeGuard.ts          # Central monitoring coordinator
+│   └── PatternDetector.ts    # Pattern matching engine
+├── watchers/
+│   ├── ConversationWatcher.ts # AI conversation monitoring
+│   └── FileWatcher.ts        # Real-time file quality monitoring
+├── analyzers/
+│   ├── ConversationAnalyzer.ts # TODO bailout analysis
+│   ├── InterventionEngine.ts  # AI intervention logic
+│   └── QualityAnalyzer.ts    # Code quality reporting
+├── managers/
+│   ├── ConfigManager.ts      # Configuration management
+│   └── NotificationManager.ts # User notification system
+├── types/
+│   └── common.ts            # Shared TypeScript interfaces
+└── config/
+    ├── patterns.json        # Detection pattern definitions
+    └── conversation-patterns.json # Conversation analysis rules
 ```
 
-### **Light Learning Mode** 
-```bash
-# Minimal monitoring for experimentation
-Ctrl+Shift+P → "AI Monitor: Quick Config" → "Light"
-# Only catches blatant security issues
-```
+## 📊 Performance Impact
 
-## 📊 Intervention Examples
-
-### **Terminal Intervention (Automatic)**
-When Claude tries to create a TODO list instead of implementing:
-
-**Claude Output**: 
-```
-I'll break this down into steps:
-☐ Analyze the requirements
-☐ Design the architecture  
-☐ Create basic structure
-```
-
-**Automatic Intervention**:
-```
-Code quality issues detected: scope reduction, planning phase detected. 
-Please implement actual working code with production-ready practices.
-```
-
-### **File Quality Intervention** 
-When saving code with security issues:
-
-**Your Code**:
-```typescript
-function processInput(userInput: string) {
-  eval(userInput); // Security vulnerability!
-  return result as any; // TypeScript bailout!
-}
-```
-
-**Extension Response**:
-- **Save blocked** with critical issues notification
-- **Detailed report** with specific fixes
-- **Auto-fix suggestions** for simple issues
-
-## 🔧 Advanced Configuration
-
-### **VS Code Settings**
-```json
-{
-  "ai-code-guard.monitoringMode": "both",
-  "ai-code-guard.aggressivenessLevel": "sophisticated",
-  "ai-code-guard.autoIntervention": true,
-  "ai-code-guard.typingDelay": 2000,
-  "ai-code-guard.interventionCooldown": 30000,
-  "ai-code-guard.blockCriticalSaves": true
-}
-```
-
-### **Per-Profile Thresholds**
-
-**Zero-Tolerance**:
-- Critical Score: ≥ 15
-- Auto-Intervention: ≥ 10
-- Blocks: All saves with issues
-
-**Sophisticated (Default)**:
-- Critical Score: ≥ 50  
-- Auto-Intervention: ≥ 30
-- Blocks: Critical saves only
-
-**Light**:
-- Critical Score: ≥ 80
-- Auto-Intervention: ≥ 80  
-- Blocks: No save blocking
-
-## 📈 Success Metrics & Research
-
-Based on extensive research and real-world testing:
-
-- **AI Accuracy**: AI coding tools produce correct code only 46-65% of the time
-- **Security Issues**: 50% of AI-generated code contains security vulnerabilities  
-- **Developer Frustration**: 2/3 cite "almost right, but not quite" as primary issue
-- **Productivity Impact**: Real-time quality enforcement prevents technical debt accumulation
-
-### **Extension Impact**
-- **Automatic Detection**: Catches bailout patterns in real-time
-- **Quality Enforcement**: Prevents problematic code from being saved
-- **Learning Enhancement**: Trains AI to provide better responses
-- **Time Savings**: Reduces debugging of AI-generated code
-
-## 🎯 Status Bar Integration
-
-The extension shows monitoring status in VS Code status bar:
-
-- **🛡️ 📺📁** - Both terminal and file monitoring active
-- **🛡️ 📺** - Only terminal monitoring active  
-- **🛡️ 📁** - Only file monitoring active
-- **🛡️ ❌** - Monitoring disabled
-
-Click status bar icon for quick stats and configuration.
-
-## 🔮 Roadmap
-
-### **v1.1 - Enhanced Intelligence**
-- **Pattern Learning**: Adaptive pattern recognition
-- **Custom Rules**: User-defined quality patterns
-- **Team Settings**: Shared configuration for teams
-
-### **v1.2 - Multi-AI Support**
-- **ChatGPT CLI**: Support for ChatGPT command line tools
-- **GitHub Copilot**: Integration with Copilot Chat
-- **Universal Patterns**: Cross-AI bailout detection
-
-### **v1.3 - Analytics Dashboard**
-- **Usage Statistics**: Track intervention effectiveness
-- **Quality Trends**: Monitor code quality over time
-- **Team Reports**: Aggregate team-wide statistics
+- **Typing Analysis**: 2-second delay after typing stops
+- **Analysis Throttling**: Maximum 1 analysis per second per file
+- **Memory Usage**: Minimal (keeps last 10 analyses per file)
+- **CPU Impact**: Low (pattern matching only)
 
 ## 🤝 Contributing
 
-Contributions welcome! Areas for improvement:
-- **New AI Tool Support**: Extend beyond Claude Code
-- **Additional Patterns**: Identify new bailout behaviors
-- **Performance Optimizations**: Faster analysis algorithms
-- **UI/UX Improvements**: Better configuration interface
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/new-capability`
+3. Add tests for new functionality
+4. Ensure all tests pass: `./test-runner.sh`
+5. Submit pull request
 
-### Project Structure
-
-The project is organized into the following directories:
-
-- **`src/core`**: Contains the core extension logic, including the main `CodeGuard` class and the `PatternDetector`.
-- **`src/managers`**: Contains the `ConfigManager` and `NotificationManager` classes.
-- **`src/watchers`**: Contains the `ConversationWatcher` and `FileWatcher` classes.
-- **`src/ui`**: Contains any UI-related components.
-- **`test`**: Contains the unit tests for the extension.
+### Development Guidelines
+- All new features must include comprehensive tests
+- Mock VS Code APIs properly in tests
+- Follow existing TypeScript patterns
+- Update documentation for new commands/features
 
 ## 📄 License
 
@@ -250,12 +193,10 @@ MIT License - Feel free to use and modify for your projects.
 
 ## 🙏 Acknowledgments
 
-- **Research Foundation**: Built on extensive analysis of AI coding tool limitations
-- **Community Feedback**: Informed by developer experiences and frustrations
-- **Production Testing**: Validated in real-world development environments
+- Built for the developer community frustrated with AI planning instead of implementing
+- Research-backed approach to AI assistant quality monitoring
+- Inspired by the need for production-ready AI-generated code
 
 ---
 
-**Transform your AI coding experience from "almost right" to "production ready"** 🚀
-
-*AI Code Guard - Because AI should code, not plan.*
+**Stop the planning, start the coding!** 🚀

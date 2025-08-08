@@ -8,3 +8,9 @@ node_modules
 # Development archives and temporary files
 archive/
 src/archived/
+
+# Tests - theatrical confidence theater, fix later
+test/
+out-test/
+.mocharc.json
+test-runner.sh

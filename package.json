@@ -1,5 +1,6 @@
 {
   "name": "ai-code-guard",
+  "type": "commonjs",
   "displayName": "AI Code Guard",
   "description": "Real-time AI code quality monitoring and intervention system",
   "version": "1.0.0",
@@ -163,7 +164,7 @@
   },
   "scripts": {
     "compile": "tsc -p ./",
-    "test": "mocha --require ts-node/register --extensions ts test/**/*.test.ts"
+    "test": "mocha --import=tsx"
   },
   "devDependencies": {
     "@types/chai": "^5.2.2",
@@ -176,6 +177,7 @@
     "sinon": "^21.0.0",
     "ts-mocha": "^11.1.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "typescript": "^4.9.4"
   }
 }
