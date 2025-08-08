@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { PatternDetector, DetectionResult } from './PatternDetector';
+import { PatternDetector, DetectionResult } from '../core/PatternDetector';
 import { NotificationManager, BailoutNotificationData } from '../managers/NotificationManager';
 
 interface FileAnalysis {
@@ -160,7 +160,7 @@ export class FileWatcher {
     
     const analysis = await this.analyzeDocument(document, 'SAVE');
     
-    if (analysis && analysis.detectionResult.qualityLevel === 'REQUIRES_ATTENTION') {
+    if (analysis && analysis.detectionResult.qualityLevel === 'CRITICAL') {
       this.outputChannel.appendLine(`🚨 CRITICAL ISSUES DETECTED - BLOCKING SAVE`);
       
       const report = this.generateQualityReport(analysis);
@@ -695,8 +695,8 @@ export class FileWatcher {
       return false;
     }
     
-    // Auto-intervene for REQUIRES_ATTENTION issues
-    return analysis.detectionResult.qualityLevel === 'REQUIRES_ATTENTION';
+    // Auto-intervene for CRITICAL issues
+    return analysis.detectionResult.qualityLevel === 'CRITICAL';
   }
 
   /**
@@ -728,9 +728,9 @@ export class FileWatcher {
   }
   
   private determineInterventionLevel(result: DetectionResult, triggerType: FileAnalysis['triggerType']): FileAnalysis['interventionLevel'] {
-    if (result.qualityLevel === 'REQUIRES_ATTENTION') {
+    if (result.qualityLevel === 'CRITICAL') {
       return triggerType === 'SAVE' ? 'BLOCK' : 'SIGNAL_AI';
-    } else if (result.qualityLevel === 'NEEDS_IMPROVEMENT' || result.severityScore >= 25) {
+    } else if (result.qualityLevel === 'POOR' || result.severityScore >= 25) {
       return 'SIGNAL_AI';
     } else if (result.severityScore >= 10) {
       return 'WARNING';
@@ -753,7 +753,7 @@ export class FileWatcher {
     const fileName = analysis.filePath.split('/').pop() || 'file';
     const notificationData: BailoutNotificationData = {
       type: 'tool_bailout',
-      patterns: analysis.detectionResult.patterns.map(p => p.category),
+      patterns: analysis.detectionResult.patterns.map((p: any) => p.category),
       severity: analysis.detectionResult.qualityLevel,
       description: `Quality issues in ${fileName} - consider requesting AI fixes`
     };

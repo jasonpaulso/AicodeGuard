@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { ConversationWatcher } from './ConversationWatcher';
-import { NotificationManager } from './NotificationManager';
-import { FileWatcher } from './FileWatcher';
+import { ConversationWatcher } from '../watchers/ConversationWatcher';
+import { NotificationManager } from '../managers/NotificationManager';
+import { FileWatcher } from '../watchers/FileWatcher';
 import { ConfigManager } from '../managers/ConfigManager';
 
 export class CodeGuard {

@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { NotificationManager } from '../managers/NotificationManager';
+import * as constants from '../constants';
 
 interface TodoBailoutAnalysis {
   severity: 'HIGH' | 'MEDIUM' | 'LOW';

@@ -39,7 +39,7 @@ export interface AggressivenessProfile {
 export class ConfigManager {
   private static instance: ConfigManager;
   private config: BailoutConfig;
-  private aggressivenessProfiles: Map<AggressivenessLevel, AggressivenessProfile>;
+  private aggressivenessProfiles: Map<AggressivenessLevel, AggressivenessProfile> = new Map();
   private outputChannel: vscode.OutputChannel;
 
   private constructor(outputChannel: vscode.OutputChannel) {

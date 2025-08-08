@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { PatternDetector } from '../src/PatternDetector';
+import { PatternDetector } from '../src/core/PatternDetector';
 
 suite('PatternDetector', () => {
   let patternDetector: PatternDetector;
