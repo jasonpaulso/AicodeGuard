@@ -36,13 +36,13 @@ export class CodeGuard {
   /**
    * Start comprehensive monitoring for AI quality issues and code problems
    */
-  public startMonitoring(): vscode.Disposable[] {
+  public async startMonitoring(): Promise<vscode.Disposable[]> {
     this.outputChannel.appendLine('🎯 Starting Comprehensive AI & Code Quality Monitoring...');
     
     const disposables: vscode.Disposable[] = [];
     
     // Start conversation monitoring
-    this.conversationWatcher.startMonitoring();
+    await this.conversationWatcher.startWatching();
     this.outputChannel.appendLine('✅ AI conversation monitoring active');
     
     // Start file monitoring

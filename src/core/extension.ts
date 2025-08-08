@@ -4,12 +4,12 @@ import { CodeGuard } from './CodeGuard';
 let monitor: CodeGuard;
 let monitoringDisposables: vscode.Disposable[] = [];
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log('🛡️ AI Code Guard Activated');
   
   // Initialize the comprehensive monitor
   monitor = new CodeGuard();
-  const disposables = monitor.startMonitoring();
+  const disposables = await monitor.startMonitoring();
   monitoringDisposables.push(...disposables);
   
   // Register all commands
