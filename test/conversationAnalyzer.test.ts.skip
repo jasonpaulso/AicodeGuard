@@ -1,0 +1,91 @@
+import { expect } from 'chai';
+import { ConversationAnalyzer } from '../src/analyzers/ConversationAnalyzer';
+import * as fs from 'fs';
+import * as path from 'path';
+
+describe('ConversationAnalyzer', () => {
+  let analyzer: ConversationAnalyzer;
+  let readFileSyncStub: sinon.SinonStub;
+
+  beforeEach(() => {
+    // Stub fs.readFileSync to control the patterns loaded
+    readFileSyncStub = sinon.stub(fs, 'readFileSync');
+    readFileSyncStub.withArgs(sinon.match(/conversation-patterns\.json$/)).returns(JSON.stringify({
+      implementationAvoidance: {
+        HIGH: ["plan implementation", "create mock"],
+        MEDIUM: ["add proper error handling"],
+        LOW: ["basic implementation"]
+      },
+      weights: { HIGH: 15, MEDIUM: 10, LOW: 5 },
+      interventionThreshold: 25
+    }));
+    analyzer = new ConversationAnalyzer();
+  });
+
+  afterEach(() => {
+    readFileSyncStub.restore();
+  });
+
+  it('should correctly analyze content with HIGH severity patterns', () => {
+    const content = "Let's plan implementation and create mock objects.";
+    const analysis = analyzer.analyzeTodoBailoutPatterns(content);
+    expect(analysis.score).to.equal(30); // 15 (plan implementation) + 15 (create mock)
+    expect(analysis.severity).to.equal('HIGH');
+    expect(analysis.bailoutPatterns).to.include('HIGH: plan implementation');
+    expect(analysis.bailoutPatterns).to.include('HIGH: create mock');
+  });
+
+  it('should correctly analyze content with MEDIUM severity patterns', () => {
+    const content = "You'll need to add proper error handling.";
+    const analysis = analyzer.analyzeTodoBailoutPatterns(content);
+    expect(analysis.score).to.equal(10); // 10 (add proper error handling)
+    expect(analysis.severity).to.equal('MEDIUM');
+    expect(analysis.bailoutPatterns).to.include('MEDIUM: add proper error handling');
+  });
+
+  it('should correctly analyze content with LOW severity patterns', () => {
+    const content = "Here's a basic implementation for you.";
+    const analysis = analyzer.analyzeTodoBailoutPatterns(content);
+    expect(analysis.score).to.equal(5); // 5 (basic implementation)
+    expect(analysis.severity).to.equal('LOW');
+    expect(analysis.bailoutPatterns).to.include('LOW: basic implementation');
+  });
+
+  it('should handle content with mixed severity patterns', () => {
+    const content = "Let's plan implementation and add proper error handling for a basic implementation.";
+    const analysis = analyzer.analyzeTodoBailoutPatterns(content);
+    expect(analysis.score).to.equal(30); // 15 (plan implementation) + 10 (error handling) + 5 (basic implementation)
+    expect(analysis.severity).to.equal('HIGH');
+  });
+
+  it('should return zero score for content with no bailout patterns', () => {
+    const content = "This is a perfectly normal sentence with no issues.";
+    const analysis = analyzer.analyzeTodoBailoutPatterns(content);
+    expect(analysis.score).to.equal(0);
+    expect(analysis.severity).to.equal('LOW');
+    expect(analysis.bailoutPatterns).to.be.empty;
+  });
+
+  it('should handle empty content', () => {
+    const content = "";
+    const analysis = analyzer.analyzeTodoBailoutPatterns(content);
+    expect(analysis.score).to.equal(0);
+    expect(analysis.severity).to.equal('LOW');
+    expect(analysis.bailoutPatterns).to.be.empty;
+  });
+
+  it('should handle patterns that are substrings of other words', () => {
+    const content = "This is a planning meeting, not a plan implementation.";
+    const analysis = analyzer.analyzeTodoBailoutPatterns(content);
+    expect(analysis.score).to.equal(15); // Should only match "plan implementation" once
+    expect(analysis.bailoutPatterns).to.include('HIGH: plan implementation');
+  });
+
+  it('should correctly determine intervention based on threshold', () => {
+    const highScoreContent = "Plan implementation and create mock."; // Score 30
+    const lowScoreContent = "Basic implementation."; // Score 5
+
+    expect(analyzer.shouldTriggerIntervention(analyzer.analyzeTodoBailoutPatterns(highScoreContent))).to.be.true;
+    expect(analyzer.shouldTriggerIntervention(analyzer.analyzeTodoBailoutPatterns(lowScoreContent))).to.be.false;
+  });
+});

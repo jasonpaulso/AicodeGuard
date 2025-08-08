@@ -9,10 +9,12 @@ export interface PatternMatch {
   source: 'code' | 'terminal';
 }
 
+export type QualityLevel = 'EXCELLENT' | 'GOOD' | 'ACCEPTABLE' | 'POOR' | 'CRITICAL';
+
 export interface DetectionResult {
   patterns: PatternMatch[];
   severityScore: number;
-  qualityLevel: 'EXCELLENT' | 'GOOD' | 'ACCEPTABLE' | 'POOR' | 'CRITICAL';
+  qualityLevel: QualityLevel;
   hasDirectRefusal: boolean;
   hasEducationalDeflection: boolean;
   terminalPatterns: PatternMatch[];

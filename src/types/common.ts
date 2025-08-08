@@ -1,9 +1,16 @@
+import { DetectionResult, QualityLevel } from '../core/PatternDetector';
+
+export { QualityLevel };
+
+export type TriggerType = 'SAVE' | 'TYPE' | 'FOCUS' | 'MANUAL';
+export type InterventionLevel = 'NONE' | 'WARNING' | 'SIGNAL_AI' | 'BLOCK';
+
 export interface FileAnalysis {
   filePath: string;
   timestamp: number;
-  detectionResult: import('../core/PatternDetector').DetectionResult;
-  triggerType: 'SAVE' | 'TYPE' | 'FOCUS' | 'MANUAL';
-  interventionLevel: 'NONE' | 'WARNING' | 'SIGNAL_AI' | 'BLOCK';
+  detectionResult: DetectionResult;
+  triggerType: TriggerType;
+  interventionLevel: InterventionLevel;
 }
 
 export interface QualityIssue {

@@ -1,0 +1,155 @@
+import { expect } from 'chai';
+import * as vscode from 'vscode';
+import { ConfigManager, MonitoringMode, AggressivenessLevel } from '../src/managers/ConfigManager';
+import * as sinon from 'sinon';
+
+// Mock VS Code's workspace.getConfiguration
+const mockGetConfiguration = (section: string) => {
+  return {
+    get: (key: string, defaultValue: any) => {
+      if (section === 'ai-code-guard') {
+        switch (key) {
+          case 'monitoringMode': return 'both';
+          case 'aggressivenessLevel': return 'sophisticated';
+          case 'autoIntervention': return true;
+          case 'typingDelay': return 2000;
+          case 'interventionCooldown': return 30000;
+          case 'blockCriticalSaves': return true;
+          default: return defaultValue;
+        }
+      }
+      return defaultValue;
+    },
+    update: async (key: string, value: any, configurationTarget: vscode.ConfigurationTarget) => {
+      // Mock update operation
+    }
+  };
+};
+
+// Mock vscode.window.createOutputChannel
+const mockOutputChannel = {
+  appendLine: sinon.stub(),
+  show: sinon.stub(),
+  dispose: sinon.stub(),
+} as unknown as vscode.OutputChannel;
+
+// Assign mocks before importing ConfigManager to ensure it uses them
+Object.defineProperty(vscode.workspace, 'getConfiguration', {
+  value: mockGetConfiguration,
+  writable: true,
+});
+
+Object.defineProperty(vscode.window, 'createOutputChannel', {
+  value: sinon.stub().returns(mockOutputChannel),
+  writable: true,
+});
+
+describe('ConfigManager', () => {
+  let configManager: ConfigManager;
+
+  beforeEach(() => {
+    configManager = ConfigManager.getInstance(mockOutputChannel);
+  });
+
+  it('should return the same instance (singleton)', () => {
+    const anotherInstance = ConfigManager.getInstance(mockOutputChannel);
+    expect(configManager).to.equal(anotherInstance);
+  });
+
+  it('should load default configuration correctly', () => {
+    const config = configManager.getConfig();
+    expect(config.monitoringMode).to.equal('both');
+    expect(config.aggressivenessLevel).to.equal('sophisticated');
+    expect(config.autoIntervention).to.be.true;
+  });
+
+  it('should return the current aggressiveness profile', () => {
+    const profile = configManager.getCurrentProfile();
+    expect(profile.name).to.equal('Sophisticated');
+    expect(profile.thresholds.criticalScore).to.equal(50);
+  });
+
+  it('should return a specific aggressiveness profile', () => {
+    const zeroToleranceProfile = configManager.getProfile('zero-tolerance');
+    expect(zeroToleranceProfile.name).to.equal('Zero-Tolerance');
+    expect(zeroToleranceProfile.thresholds.criticalScore).to.equal(15);
+  });
+
+  it('should correctly determine quality level', () => {
+    // Sophisticated profile thresholds: critical: 50, poor: 30, warning: 15
+    expect(configManager.determineQualityLevel(60)).to.equal('CRITICAL');
+    expect(configManager.determineQualityLevel(40)).to.equal('POOR');
+    expect(configManager.determineQualityLevel(20)).to.equal('ACCEPTABLE');
+    expect(configManager.determineQualityLevel(10)).to.equal('GOOD');
+    expect(configManager.determineQualityLevel(3)).to.equal('EXCELLENT');
+  });
+
+  it('should correctly determine if file watcher is enabled', () => {
+    configManager.setMonitoringMode('fileWatcher');
+    expect(configManager.isFileWatcherEnabled()).to.be.true;
+    configManager.setMonitoringMode('both');
+    expect(configManager.isFileWatcherEnabled()).to.be.true;
+    configManager.setMonitoringMode('terminal');
+    expect(configManager.isFileWatcherEnabled()).to.be.false;
+  });
+
+  it('should correctly determine if terminal monitoring is enabled', () => {
+    configManager.setMonitoringMode('terminal');
+    expect(configManager.isTerminalMonitoringEnabled()).to.be.true;
+    configManager.setMonitoringMode('both');
+    expect(configManager.isTerminalMonitoringEnabled()).to.be.true;
+    configManager.setMonitoringMode('fileWatcher');
+    expect(configManager.isTerminalMonitoringEnabled()).to.be.false;
+  });
+
+  it('should correctly determine if auto intervention is enabled', async () => {
+    // Default is true for sophisticated
+    expect(configManager.isAutoInterventionEnabled()).to.be.true;
+
+    // Toggle it off
+    await configManager.toggleAutoIntervention();
+    expect(configManager.isAutoInterventionEnabled()).to.be.false;
+
+    // Toggle it back on
+    await configManager.toggleAutoIntervention();
+    expect(configManager.isAutoInterventionEnabled()).to.be.true;
+
+    // Test with a profile that has autoInterventionEnabled: false
+    await configManager.setAggressivenessLevel('light');
+    expect(configManager.isAutoInterventionEnabled()).to.be.true; // Still true because config.autoIntervention is true
+  });
+
+  it('should correctly determine if saves should be blocked', async () => {
+    // Default is true for sophisticated
+    expect(configManager.shouldBlockSaves()).to.be.true;
+
+    // Set to light mode where blockSaves is false
+    await configManager.setAggressivenessLevel('light');
+    expect(configManager.shouldBlockSaves()).to.be.false;
+
+    // Set back to sophisticated
+    await configManager.setAggressivenessLevel('sophisticated');
+    expect(configManager.shouldBlockSaves()).to.be.true;
+  });
+
+  it('should correctly determine if auto intervention should trigger based on score', async () => {
+    await configManager.setAggressivenessLevel('sophisticated'); // Threshold: 30
+    expect(configManager.shouldAutoIntervene(29)).to.be.false;
+    expect(configManager.shouldAutoIntervene(30)).to.be.true;
+    expect(configManager.shouldAutoIntervene(50)).to.be.true;
+
+    await configManager.setAggressivenessLevel('light'); // Threshold: 80
+    expect(configManager.shouldAutoIntervene(79)).to.be.false;
+    expect(configManager.shouldAutoIntervene(80)).to.be.true;
+  });
+
+  it('should correctly determine if a pattern is enabled', async () => {
+    await configManager.setAggressivenessLevel('sophisticated');
+    expect(configManager.isPatternEnabled('securityIssues')).to.be.true;
+    expect(configManager.isPatternEnabled('typescriptBailouts')).to.be.true;
+
+    await configManager.setAggressivenessLevel('light');
+    expect(configManager.isPatternEnabled('securityIssues')).to.be.true;
+    expect(configManager.isPatternEnabled('typescriptBailouts')).to.be.false;
+  });
+});

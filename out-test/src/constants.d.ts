@@ -1,0 +1,15 @@
+export declare const FOCUS_ANALYSIS_DELAY = 500;
+export declare const MAX_ANALYSIS_HISTORY = 10;
+export declare const CORRECT_INTERVENTION_THRESHOLD = 25;
+export declare const WARNING_INTERVENTION_THRESHOLD = 10;
+export declare const AUTO_INTERVENTION_SCORE_THRESHOLD = 30;
+export declare const TERMINAL_CORRECTION_DELAY = 1000;
+export declare const INTERVENTION_LOCK_RELEASE_DELAY = 5000;
+export declare const RECENT_ANALYSES_TIMESPAN = 3600000;
+export declare const CONVERSATION_ANALYSIS_DELAY = 1000;
+export declare const HIGH_SEVERITY_PATTERN_SCORE = 10;
+export declare const AVOIDANCE_WORD_SCORE = 8;
+export declare const SCOPE_REDUCTION_SCORE = 12;
+export declare const MEDIUM_SEVERITY_PATTERN_SCORE = 5;
+export declare const INTERVENTION_COOLDOWN = 30000;
+export declare const CORRECTION_PROMPT_DELAY = 1500;
