@@ -1,21 +1,13 @@
 {
-  "name": "claude-bailout-monitor",
-  "displayName": "Claude Bailout Monitor",
-  "description": "Monitors terminal output for AI coding assistant bailout patterns based on research showing 46-65% accuracy rates",
-  "version": "0.0.1",
+  "name": "ai-code-guard",
+  "displayName": "AI Code Guard",
+  "description": "Real-time AI code quality monitoring and intervention system",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Other",
-    "Machine Learning"
-  ],
-  "keywords": [
-    "ai",
-    "claude",
-    "code-quality",
-    "monitoring",
-    "terminal"
+    "Other"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -24,43 +16,162 @@
   "contributes": {
     "commands": [
       {
-        "command": "claudeBailoutMonitor.enable",
-        "title": "Enable Bailout Monitoring"
+        "command": "ai-code-guard.configure",
+        "title": "AI Code Guard: Configure"
       },
       {
-        "command": "claudeBailoutMonitor.disable", 
-        "title": "Disable Bailout Monitoring"
+        "command": "ai-code-guard.quickConfig",
+        "title": "AI Code Guard: Quick Config"
       },
       {
-        "command": "claudeBailoutMonitor.showStats",
-        "title": "Show Detection Statistics"
+        "command": "ai-code-guard.testPatterns",
+        "title": "AI Code Guard: Test Patterns"
+      },
+      {
+        "command": "ai-code-guard.enable",
+        "title": "AI Code Guard: Enable"
+      },
+      {
+        "command": "ai-code-guard.disable",
+        "title": "AI Code Guard: Disable"
+      },
+      {
+        "command": "ai-code-guard.enableFileMonitoring",
+        "title": "AI Code Guard: Enable File Monitoring"
+      },
+      {
+        "command": "ai-code-guard.disableFileMonitoring",
+        "title": "AI Code Guard: Disable File Monitoring"
+      },
+      {
+        "command": "ai-code-guard.analyzeCurrentFile",
+        "title": "AI Code Guard: Analyze Current File"
+      },
+      {
+        "command": "ai-code-guard.fixCodeIssues",
+        "title": "AI Code Guard: Fix Code Issues"
+      },
+      {
+        "command": "ai-code-guard.showStats",
+        "title": "AI Code Guard: Show Stats"
+      },
+      {
+        "command": "ai-code-guard.showDetails",
+        "title": "AI Code Guard: Show Details"
+      },
+      {
+        "command": "ai-code-guard.nuclearOverride",
+        "title": "AI Code Guard: Nuclear Override"
+      },
+      {
+        "command": "ai-code-guard.analyzeSelection",
+        "title": "AI Code Guard: Analyze Selection"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorHasSelection",
+          "command": "ai-code-guard.analyzeSelection",
+          "group": "ai-code-guard"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "resourceExtname =~ /\\.(ts|js|tsx|jsx|py|java|cpp|c|cs|php|rb|go|rs)$/",
+          "command": "ai-code-guard.analyzeCurrentFile",
+          "group": "ai-code-guard"
+        }
+      ]
+    },
     "configuration": {
-      "title": "Claude Bailout Monitor",
+      "title": "AI Code Guard",
       "properties": {
-        "claudeBailoutMonitor.enabled": {
+        "ai-code-guard.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable bailout pattern detection"
+          "description": "Enable real-time code quality monitoring"
         },
-        "claudeBailoutMonitor.sensitivity": {
+        "ai-code-guard.monitoringMode": {
           "type": "string",
-          "enum": ["low", "medium", "high"],
-          "default": "medium",
-          "description": "Detection sensitivity level"
+          "enum": [
+            "fileWatcher",
+            "terminal",
+            "both",
+            "disabled"
+          ],
+          "enumDescriptions": [
+            "Only monitor file quality",
+            "Only monitor AI conversations",
+            "Monitor both files and conversations (recommended)",
+            "Disable all monitoring"
+          ],
+          "default": "both",
+          "description": "Select what to monitor"
+        },
+        "ai-code-guard.aggressivenessLevel": {
+          "type": "string",
+          "enum": [
+            "zero-tolerance",
+            "sophisticated",
+            "light"
+          ],
+          "enumDescriptions": [
+            "Maximum protection - catches everything, blocks aggressively",
+            "Intelligent monitoring with balanced protection (recommended)",
+            "Minimal monitoring - only blatant security issues"
+          ],
+          "default": "sophisticated",
+          "description": "How aggressive should monitoring be"
+        },
+        "ai-code-guard.autoIntervention": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic terminal intervention"
+        },
+        "ai-code-guard.typingDelay": {
+          "type": "number",
+          "default": 2000,
+          "minimum": 500,
+          "maximum": 10000,
+          "description": "Delay in milliseconds after typing stops before analysis"
+        },
+        "ai-code-guard.interventionCooldown": {
+          "type": "number",
+          "default": 30000,
+          "minimum": 5000,
+          "maximum": 300000,
+          "description": "Cooldown period between interventions in milliseconds"
+        },
+        "ai-code-guard.blockCriticalSaves": {
+          "type": "boolean",
+          "default": true,
+          "description": "Block saving files with critical code quality issues"
+        },
+        "ai-code-guard.severity": {
+          "type": "string",
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ],
+          "default": "HIGH",
+          "description": "[Legacy] Minimum severity level for alerts"
         }
       }
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "test": "ts-mocha test/**/*.test.ts"
   },
   "devDependencies": {
-    "@types/vscode": "^1.74.0",
+    "@types/mocha": "^10.0.10",
     "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "mocha": "^11.7.1",
+    "ts-mocha": "^11.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "^4.9.4"
   }
 }

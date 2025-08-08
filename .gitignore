@@ -4,3 +4,7 @@ node_modules
 .vscode-test/
 *.vsix
 .DS_Store
+
+# Development archives and temporary files
+archive/
+src/archived/
