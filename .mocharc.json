@@ -1,6 +1,0 @@
-{
-  "import": ["tsx"],
-  "require": ["./test/setup.ts"],
-  "spec": ["test/**/*.test.ts"],
-  "ui": "tdd"
-}
