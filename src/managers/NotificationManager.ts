@@ -97,15 +97,19 @@ export class NotificationManager {
   private showToolBailout(data: BailoutNotificationData): void {
     const icon = data.severity === 'HIGH' || data.severity === 'CRITICAL' ? '🚨' : '⚠️';
     vscode.window.showWarningMessage(
-      `${icon} Quality Issue! ${data.tool || 'Implementation gap'} detected`,
+      `${icon} Quality Issue! ${data.tool || 'Code quality issue'} detected`,
       'Show Details',
       'Quality Enforcement',
       'Ignore'
     ).then(selection => {
       if (selection === 'Show Details') {
-        vscode.window.showInformationMessage(
-          `Quality Issue Details:\n\nTool: ${data.tool}\nConfidence: ${data.confidence}\nSeverity: ${data.severity}\n\n${data.description}`
-        );
+        let details = 'Quality Issue Details:\n\n';
+        if (data.tool) details += `Tool: ${data.tool}\n`;
+        if (data.confidence) details += `Confidence: ${data.confidence}\n`;
+        if (data.severity) details += `Severity: ${data.severity}\n`;
+        if (data.description) details += `\n${data.description}`;
+        
+        vscode.window.showInformationMessage(details);
       } else if (selection === 'Quality Enforcement') {
         vscode.commands.executeCommand('ai-code-guard.enforceQuality');
       }

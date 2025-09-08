@@ -4,6 +4,10 @@
   "displayName": "AI Code Guard",
   "description": "Real-time AI code quality monitoring and intervention system",
   "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ai-code-guard"
+  },
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -13,7 +17,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./out/extension.js",
+  "main": "./out/src/extension.js",
   "contributes": {
     "commands": [
       {
